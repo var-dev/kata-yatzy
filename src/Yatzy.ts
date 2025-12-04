@@ -9,15 +9,10 @@ export default class Yatzy {
   static chance(...fiveDices: FiveDices): number {
     return fiveDices.reduce((accumulator, current) => accumulator + current, 0);
   }
-
-  static yatzy(...args: number[]): number {
-    var counts = [0, 0, 0, 0, 0, 0, 0, 0];
-    for (var i = 0; i != args.length; ++i) {
-      var die = args[i];
-      counts[die! - 1]!++;
-    }
-    for (i = 0; i != 6; i++) if (counts[i] == 5) return 50;
-    return 0;
+  // Yatzy: if all dice have the same number, the player scores 50 points.
+  static yatzy(...fiveDices: FiveDices): number {
+    if (new Set(fiveDices).size === 1) { return 50 }
+    return 0
   }
 
   static ones(d1: number, d2: number, d3: number, d4: number, d5: number): number {
