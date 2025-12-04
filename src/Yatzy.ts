@@ -1,18 +1,13 @@
+type FiveDices = [number, number, number, number, number]
 export default class Yatzy {
-  private dice: [number, number, number, number, number, ];
+  private fiveDices: FiveDices;
 
-  constructor(d1: number, d2: number, d3: number, d4: number, _5: number) {
-    this.dice = [d1, d2, d3, d4, _5];
+  constructor(...fiveDices: FiveDices) {
+    this.fiveDices = fiveDices;
   }
 
-  static chance(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var total = 0;
-    total += d1;
-    total += d2;
-    total += d3;
-    total += d4;
-    total += d5;
-    return total;
+  static chance(...fiveDices: FiveDices): number {
+    return fiveDices.reduce((accumulator, current) => accumulator + current, 0);
   }
 
   static yatzy(...args: number[]): number {
@@ -170,7 +165,7 @@ export default class Yatzy {
     var sum;
     sum = 0;
     for (let at = 0; at != 5; at++) {
-      if (this.dice[at] == 4) {
+      if (this.fiveDices[at] == 4) {
         sum += 4;
       }
     }
@@ -180,13 +175,13 @@ export default class Yatzy {
   fives(): number {
     let s = 0;
     var i;
-    for (i = 0; i < this.dice.length; i++) if (this.dice[i] == 5) s = s + 5;
+    for (i = 0; i < this.fiveDices.length; i++) if (this.fiveDices[i] == 5) s = s + 5;
     return s;
   }
 
   sixes(): number {
     let sum = 0;
-    for (var at = 0; at < this.dice.length; at++) if (this.dice[at] == 6) sum = sum + 6;
+    for (var at = 0; at < this.fiveDices.length; at++) if (this.fiveDices[at] == 6) sum = sum + 6;
     return sum;
   }
 }
