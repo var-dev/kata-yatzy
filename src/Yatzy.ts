@@ -14,39 +14,19 @@ export default class Yatzy {
     if (new Set(fiveDices).size === 1) { return 50 }
     return 0
   }
-
-  static ones(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var sum = 0;
-    if (d1 == 1) sum++;
-    if (d2 == 1) sum++;
-    if (d3 == 1) sum++;
-    if (d4 == 1) sum++;
-    if (d5 == 1) sum++;
-
-    return sum;
+  // The player scores the sum of the dice that reads one, two, three, four, five or six, respectively
+  static ones(...fiveDices: FiveDices): number {
+    return singles(1)(...fiveDices)
   }
 
-  static twos(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var sum = 0;
-    if (d1 == 2) sum += 2;
-    if (d2 == 2) sum += 2;
-    if (d3 == 2) sum += 2;
-    if (d4 == 2) sum += 2;
-    if (d5 == 2) sum += 2;
-    return sum;
+  static twos(...fiveDices: FiveDices): number {
+    return singles(2)(...fiveDices)
   }
 
-  static threes(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var s;
-    s = 0;
-    if (d1 == 3) s += 3;
-    if (d2 == 3) s += 3;
-    if (d3 == 3) s += 3;
-    if (d4 == 3) s += 3;
-    if (d5 == 3) s += 3;
-    return s;
+  static threes(...fiveDices: FiveDices): number {
+    return singles(3)(...fiveDices)
   }
-
+  // The player scores the sum of the two highest matching dice.
   static score_pair(d1: number, d2: number, d3: number, d4: number, d5: number): number {
     var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     counts[d1 - 1]!++;
@@ -178,5 +158,12 @@ export default class Yatzy {
     let sum = 0;
     for (var at = 0; at < this.fiveDices.length; at++) if (this.fiveDices[at] == 6) sum = sum + 6;
     return sum;
+  }
+}
+
+
+function singles(filter:number){
+  return (...fiveDices: FiveDices): number => {
+    return fiveDices.filter((value)=>value===filter).reduce((accumulator, value) => accumulator + value, 0);
   }
 }
