@@ -1,4 +1,6 @@
+
 type Die = 1 | 2 | 3 | 4 | 5 | 6
+type IndexDie = 0 | 1 | 2 | 3 | 4 | 5
 type FiveDices = [Die, Die, Die, Die, Die]
 export default class Yatzy {
   private fiveDices: FiveDices;
@@ -23,9 +25,17 @@ export default class Yatzy {
   static twos(...fiveDices: FiveDices): number {
     return singles(2)(...fiveDices)
   }
-
   static threes(...fiveDices: FiveDices): number {
     return singles(3)(...fiveDices)
+  }
+  static fours(...fiveDices: FiveDices): number {
+    return singles(4)(...fiveDices)
+  }
+  static fives(...fiveDices: FiveDices): number {
+    return singles(5)(...fiveDices)
+  }
+  static sixes(...fiveDices: FiveDices): number {
+    return singles(6)(...fiveDices)
   }
   // The player scores the sum of the two highest matching dice.
   static score_pair(...fiveDices: FiveDices): number {
@@ -34,101 +44,54 @@ export default class Yatzy {
   }
   // Two pairs: If there are two pairs of dice with the same number, the player scores the sum of these dice
   static two_pair(...fiveDices: FiveDices): number {
-    var counts = Array(fiveDices.length).fill(0)
-    fiveDices.forEach((value:Die)=>{counts[value-1]++})
-    return counts.map((value, index) => value >= 2 ? index+1 : 0).reduce((acc, value)=>acc+value, 0) * 2
+    var counts = Array(6).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[dieValueToIndex(value)]++})
+    return counts.map((value, index) => value >= 2 ? indexToDieValue(index) as number : 0).reduce((acc, value)=>acc+value, 0) * 2
   }
   // Four of a kind: If there are four dice with the same number, the player scores the sum of these dice. 
   static four_of_a_kind(...fiveDices: FiveDices): number {
-    var counts = Array(fiveDices.length).fill(0)
-    fiveDices.forEach((value:Die)=>{counts[value-1]++})
-    return counts.map((value, index) => value >= 4 ? index+1 : 0).reduce((acc, value)=>acc+value, 0) * 4
+    var counts = Array(6).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[dieValueToIndex(value)]++})
+    return counts.map((value, index) => value >= 4 ? indexToDieValue(index) as number : 0).reduce((acc, value)=>acc+value, 0) * 4
   }
   //Three of a kind: If there are three dice with the same number, the player scores the sum of these dice.
   static three_of_a_kind(...fiveDices: FiveDices): number {
-    var counts = Array(fiveDices.length).fill(0)
-    fiveDices.forEach((value:Die)=>{counts[value-1]++})
-    return counts.map((value, index) => value >= 3 ? index+1 : 0).reduce((acc, value)=>acc+value, 0) * 3
+    var counts = Array(6).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[dieValueToIndex(value)]++})
+    return counts.map((value, index) => value >= 3 ? indexToDieValue(index) as number : 0).reduce((acc, value)=>acc+value, 0) * 3
   }
   // Small straight: When placed on “small straight”, if the dice read 1,2,3,4,5,
   // the player scores 15 (the sum of all the dice).
-  static smallStraight(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    tallies = [0, 0, 0, 0, 0, 0, 0];
-    tallies[d1 - 1]! += 1;
-    tallies[d2 - 1]! += 1;
-    tallies[d3 - 1]! += 1;
-    tallies[d4 - 1]! += 1;
-    tallies[d5 - 1]! += 1;
-    if (tallies[0] == 1 && tallies[1] == 1 && tallies[2] == 1 && tallies[3] == 1 && tallies[4] == 1) return 15;
-    return 0;
+  static smallStraight(...fiveDices: FiveDices): number {
+    var counts = Array(6).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[dieValueToIndex(value)]++})
+    return counts
+      .slice(0,5)
+      .filter((value) => value === 1)
+      .filter((value, index, array)=>array.length === 5)
+      .reduce((acc, val, index)=>acc + indexToDieValue(index), 0)
   }
-
-  static largeStraight(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    tallies = [0, 0, 0, 0, 0, 0, 0, 0];
-    tallies[d1 - 1]! += 1;
-    tallies[d2 - 1]! += 1;
-    tallies[d3 - 1]! += 1;
-    tallies[d4 - 1]! += 1;
-    tallies[d5 - 1]! += 1;
-    if (tallies[1] == 1 && tallies[2] == 1 && tallies[3] == 1 && tallies[4] == 1 && tallies[5] == 1) return 20;
-    return 0;
+  // Large straight: When placed on “large straight”, if the dice read 2,3,4,5,6,
+  // the player scores 20 (the sum of all the dice).
+  static largeStraight(...fiveDices: FiveDices): number {
+    var counts = Array(6).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[dieValueToIndex(value)]++})
+    return counts
+      .slice(1,6)
+      .filter((value) => value === 1)
+      .filter((value, index, array)=>array.length === 5)
+      .reduce((acc, val, index)=>acc+index+2, 0)
   }
-
-  static fullHouse(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    var _2 = false;
-    var i;
-    var _2_at = 0;
-    var _3 = false;
-    var _3_at = 0;
-
-    tallies = [0, 0, 0, 0, 0, 0, 0, 0];
-    tallies[d1 - 1]! += 1;
-    tallies[d2 - 1]! += 1;
-    tallies[d3 - 1]! += 1;
-    tallies[d4 - 1]! += 1;
-    tallies[d5 - 1]! += 1;
-
-    for (i = 0; i != 6; i += 1)
-      if (tallies[i] == 2) {
-        _2 = true;
-        _2_at = i + 1;
-      }
-
-    for (i = 0; i != 6; i += 1)
-      if (tallies[i] == 3) {
-        _3 = true;
-        _3_at = i + 1;
-      }
-
-    if (_2 && _3) return _2_at * 2 + _3_at * 3;
-    else return 0;
-  }
-
-  fours(): number {
-    var sum;
-    sum = 0;
-    for (let at = 0; at != 5; at++) {
-      if (this.fiveDices[at] == 4) {
-        sum += 4;
-      }
-    }
-    return sum;
-  }
-
-  fives(): number {
-    let s = 0;
-    var i;
-    for (i = 0; i < this.fiveDices.length; i++) if (this.fiveDices[i] == 5) s = s + 5;
-    return s;
-  }
-
-  sixes(): number {
-    let sum = 0;
-    for (var at = 0; at < this.fiveDices.length; at++) if (this.fiveDices[at] == 6) sum = sum + 6;
-    return sum;
+  //Full house: If the dice are two of a kind and three of a kind, the player scores the sum of all the dice. 
+  static fullHouse(...fiveDices: FiveDices): number {
+    var counts = Array(6).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[dieValueToIndex(value)]++})
+    return counts
+      .filter((value, index, array)=>array.some((value)=> value === 2))
+      .filter((value, index, array)=>array.some((value)=> value === 3))
+      .reduce((acc, value, index)=>{
+        return (indexToDieValue(index))*value + acc
+      },0)
   }
 }
 
@@ -149,3 +112,20 @@ function matchingDices(...fiveDices: FiveDices): number[] {
     .filter((value) => value !== undefined)
   return matchingDices
 }
+
+function indexToDieValue(index: number): Die {
+  assert(index >= 0 && index <= 5)
+  return (index + 1) as Die
+}
+
+function dieValueToIndex(dieValue: number): IndexDie {
+  assert(dieValue >= 1 && dieValue <= 6)
+  return (dieValue - 1) as IndexDie
+}
+function assert(condition: boolean): asserts condition {
+  class AssertError extends Error{}
+  if (!condition) {
+    throw new AssertError("Assertion error")
+  }
+}
+
