@@ -1,4 +1,5 @@
-type FiveDices = [number, number, number, number, number]
+type Die = 1 | 2 | 3 | 4 | 5 | 6
+type FiveDices = [Die, Die, Die, Die, Die]
 export default class Yatzy {
   private fiveDices: FiveDices;
 
@@ -32,48 +33,25 @@ export default class Yatzy {
     return highestNumber! * 2
   }
   // Two pairs: If there are two pairs of dice with the same number, the player scores the sum of these dice
-  static two_pair(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    counts[d1 - 1]!++;
-    counts[d2 - 1]!++;
-    counts[d3 - 1]!++;
-    counts[d4 - 1]!++;
-    counts[d5 - 1]!++;
-    var n = 0;
-    var score = 0;
-    for (let i = 0; i < 6; i += 1)
-      if (counts[6 - i - 1]! >= 2) {
-        n++;
-        score += 6 - i;
-      }
-    if (n == 2) return score * 2;
-    else return 0;
+  static two_pair(...fiveDices: FiveDices): number {
+    var counts = Array(fiveDices.length).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[value-1]++})
+    return counts.map((value, index) => value >= 2 ? index+1 : 0).reduce((acc, value)=>acc+value, 0) * 2
   }
-
-  static four_of_a_kind(_1: number, _2: number, d3: number, d4: number, d5: number): number {
-    var tallies;
-    tallies = [0, 0, 0, 0, 0, 0, 0, 0];
-    tallies[_1 - 1]!++;
-    tallies[_2 - 1]!++;
-    tallies[d3 - 1]!++;
-    tallies[d4 - 1]!++;
-    tallies[d5 - 1]!++;
-    for (let i = 0; i < 6; i++) if (tallies[i]! >= 4) return (i + 1) * 4;
-    return 0;
+  // Four of a kind: If there are four dice with the same number, the player scores the sum of these dice. 
+  static four_of_a_kind(...fiveDices: FiveDices): number {
+    var counts = Array(fiveDices.length).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[value-1]++})
+    return counts.map((value, index) => value >= 4 ? index+1 : 0).reduce((acc, value)=>acc+value, 0) * 4
   }
-
-  static three_of_a_kind(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var t;
-    t = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    t[d1 - 1]!++;
-    t[d2 - 1]!++;
-    t[d3 - 1]!++;
-    t[d4 - 1]!++;
-    t[d5 - 1]!++;
-    for (let i = 0; i < 6; i++) if (t[i]! >= 3) return (i + 1) * 3;
-    return 0;
+  //Three of a kind: If there are three dice with the same number, the player scores the sum of these dice.
+  static three_of_a_kind(...fiveDices: FiveDices): number {
+    var counts = Array(fiveDices.length).fill(0)
+    fiveDices.forEach((value:Die)=>{counts[value-1]++})
+    return counts.map((value, index) => value >= 3 ? index+1 : 0).reduce((acc, value)=>acc+value, 0) * 3
   }
-
+  // Small straight: When placed on “small straight”, if the dice read 1,2,3,4,5,
+  // the player scores 15 (the sum of all the dice).
   static smallStraight(d1: number, d2: number, d3: number, d4: number, d5: number): number {
     var tallies;
     tallies = [0, 0, 0, 0, 0, 0, 0];
