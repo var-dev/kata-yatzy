@@ -27,18 +27,11 @@ export default class Yatzy {
     return singles(3)(...fiveDices)
   }
   // The player scores the sum of the two highest matching dice.
-  static score_pair(d1: number, d2: number, d3: number, d4: number, d5: number): number {
-    var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-    counts[d1 - 1]!++;
-    counts[d2 - 1]!++;
-    counts[d3 - 1]!++;
-    counts[d4 - 1]!++;
-    counts[d5 - 1]!++;
-    var at;
-    for (at = 0; at != 6; at++) if (counts[6 - at - 1]! >= 2) return (6 - at) * 2;
-    return 0;
+  static score_pair(...fiveDices: FiveDices): number {
+    const highestNumber = matchingDices(...fiveDices).reduce((acc,value)=>(value??0)>=(acc??0) ? value : acc, 0)
+    return highestNumber! * 2
   }
-
+  // Two pairs: If there are two pairs of dice with the same number, the player scores the sum of these dice
   static two_pair(d1: number, d2: number, d3: number, d4: number, d5: number): number {
     var counts = [0, 0, 0, 0, 0, 0, 0, 0, 0];
     counts[d1 - 1]!++;
@@ -166,4 +159,15 @@ function singles(filter:number){
   return (...fiveDices: FiveDices): number => {
     return fiveDices.filter((value)=>value===filter).reduce((accumulator, value) => accumulator + value, 0);
   }
+}
+function matchingDices(...fiveDices: FiveDices): number[] {
+  const matchingDices = fiveDices
+    .map((value, index, array)=>{
+      if (array.filter(v=>v===value).length>=2){
+        return value
+      }
+      return
+      })
+    .filter((value) => value !== undefined)
+  return matchingDices
 }
